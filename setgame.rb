@@ -30,7 +30,7 @@ class SetGame
 
 	def print_deck
 		for i in (0..11) do
-			puts @table[i][0] + " " + @table[i][1] + " " + @table[i][2] + " " + @table[i][3]
+			puts "#{i}. " + @table[i][0] + " " + @table[i][1] + " " + @table[i][2] + " " + @table[i][3]
 		end
 	end
 
@@ -79,20 +79,28 @@ class SetGame
 		end
 	end
 
-	def match?(attributes)
-		len = attributes.uniq.length
-		len == 1 or len == 3
-	end
-
 	def check_set?(cards)
-		matched = true
+		matched = false
+		unique = 0
 		card_attributes = []
 		for i in (0..3) do
 			card_attributes.push(cards.at(0).at(i))
 			card_attributes.push(cards.at(1).at(i)) 
 			card_attributes.push(cards.at(2).at(i))
-			matched = false unless match? card_attributes 
+			#if three card attributes match, player found a set
+			if(card_attributes.uniq.length == 1)
+				matched = true
+			#otherwise check that all attributes are unique
+			elsif(card_attributes.uniq.length == 3)
+				unique += 1
+			end
+			#if all four attributes are unique, we have a set
+			matched = true if unique == 4 
+			card_attributes.pop
+			card_attributes.pop
+			card_attributes.pop
 		end
+		return matched
 	end
 
 	def update_score(player, points)
@@ -121,9 +129,9 @@ puts "How many players?"
 numPlayers = gets.chomp.to_i
 players = []
 for i in (1..numPlayers) do
-	puts "What is the name of player " + i.to_s + "?"
-	name = gets
-	puts "Welcome, " + name + "!"
+	puts"What is the name of player " + i.to_s + "?"
+	name = gets.chomp
+	puts "Welcome, #{name}!"
 	players[i] = Player.new(name)
 end
 
