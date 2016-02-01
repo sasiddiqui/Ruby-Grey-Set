@@ -29,9 +29,18 @@ class SetGame
 	end
 
 	def print_deck
+
 		for i in (0..11) do
-			puts "#{i}. " + @table[i][0] + " " + @table[i][1] + " " + @table[i][2] + " " + @table[i][3]
+			puts "#{i}. " + @table[i][0] + "     \t" + @table[i][1] + "     \t" + @table[i][2] + "     \t" + @table[i][3]
 		end
+	end
+
+	def print_scores(numPlayers, players)
+		puts "Score Board\n"
+		for i in (1..numPlayers) do
+			puts players[i].name + ": " + players[i].get_score.to_s
+		end
+		puts "\n"
 	end
 
 	def deck_size
@@ -45,9 +54,9 @@ class SetGame
 
 	def set_exists?
 		isSet = false
-		for i in (0..9) do
-			for j in (1..11) do
-				for k in (2..11) do
+		for i in (0..11) do
+			for j in (0..11) do
+				for k in (0..11) do
 					cards = []
 					cards.push(@table[i])
 					cards.push(@table[j])
@@ -59,9 +68,9 @@ class SetGame
 	end
 
 	def input_set(player)
-		puts "Input the index of three cards in a set:"
 		cards = []
 		card_index = []
+		puts "Input the number of each card individually:"
 		card_index.push(gets.chomp.to_i)
 		card_index.push(gets.chomp.to_i)
 		card_index.push(gets.chomp.to_i)
@@ -75,32 +84,30 @@ class SetGame
 			draw_cards if @table.size < 12
 		else
 			update_score(player, -1)
-			puts "Sorry that is not a set."
+			puts "Sorry, that is not a set."
 		end
 	end
 
 	def check_set?(cards)
-		matched = false
 		unique = 0
 		card_attributes = []
+		isSet = true
 		for i in (0..3) do
+			matched = false
 			card_attributes.push(cards.at(0).at(i))
 			card_attributes.push(cards.at(1).at(i)) 
 			card_attributes.push(cards.at(2).at(i))
-			#if three card attributes match, player found a set
-			if(card_attributes.uniq.length == 1)
+			#if the three attributes match, or if they are all unique, these attributes "match"
+			if((card_attributes.uniq.length == 1)||(card_attributes.uniq.length == 3))
 				matched = true
-			#otherwise check that all attributes are unique
-			elsif(card_attributes.uniq.length == 3)
-				unique += 1
 			end
-			#if all four attributes are unique, we have a set
-			matched = true if unique == 4 
-			card_attributes.pop
-			card_attributes.pop
-			card_attributes.pop
+			#If we find a category of attribute where there is not a match, then these cards are not a set
+			if !matched then
+				isSet = false
+			end
+			card_attributes = []
 		end
-		return matched
+		return isSet
 	end
 
 	def update_score(player, points)
@@ -117,7 +124,9 @@ class Player
 	def name
 		@name
 	end
-
+	def get_score
+		@score
+	end
 	def set_score(points)
 		@score += points
 	end
@@ -135,15 +144,20 @@ for i in (1..numPlayers) do
 	players[i] = Player.new(name)
 end
 
-
+puts "Lets get started, here's the cards on the table:"
 game = SetGame.new
 while game.deck_size > 0 do
+	game.print_scores numPlayers, players
 	game.print_deck
 	if game.set_exists? then
 		puts "Buzz in if you found a set"
 		playerNum = gets.chomp.to_i
+		if playerNum > numPlayers or playerNum < 1 then
+			puts "Sorry, that is not the number of a player!"
+		else
 		puts "Ok, " + players[playerNum].name + ". What is your set?"
 		game.input_set players[playerNum]
+		end
 	else
 		puts "Looks like there's no sets on the table. I'll draw some more cards."
 		game.draw_cards
