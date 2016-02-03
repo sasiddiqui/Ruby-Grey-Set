@@ -3,21 +3,21 @@
 
 class SetGame
 
-	@@colors = ['red', 'green', 'blue']
 	@@numbers = ['one', 'two', 'three']
-	@@shapes = ['oval', 'squiggle', 'diamond']
-	@@fills = ['solid', 'stripes', 'outlined']
+    @@colors = ['red', 'green', 'blue']
+	@@shapes = ['diamond', 'oval', 'squiggle']
+	@@fills = ['outlined', 'stripes', 'solid']
 
 	
 
 	def initialize
 		@deck = []
 
-		for color in @@colors do
-			for shape in @@shapes do
-				for fill in @@fills do
-					for number in @@numbers do
-						@deck.push [color, shape, fill, number]
+		for number in @@numbers do
+			for color in @@colors do
+				for shape in @@shapes do
+					for fill in @@fills do
+						@deck.push [number, color, shape, fill]
 					end
 				end
 			end
@@ -113,6 +113,13 @@ class SetGame
 	def update_score(player, points)
 		player.set_score points
 	end
+
+	# Given a card, returns a filename
+	def filename(card) 
+	   num = @@numbers.index(card[0]) + 3*@@colors.index(card[1]) + 9*@@colors.index(card[2]) + 27*@@colors.index(card[3])
+       "cards/card#{num.to_s.rjust(3, "0")}.jpg"
+    end
+
 end
 
 class Player
@@ -170,6 +177,8 @@ for i in numPlayers do
 		index = i 
 	end
 end
+
+
 
 puts "With a score of " + players[index].score.to_s + ", The winner is....."
 puts players[index].name + "!"
